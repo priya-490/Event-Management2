@@ -4,7 +4,8 @@ import 'sign_up_screen.dart'; // Import your SignInScreen file
 import 'sign_in_sign_up.dart';
 import 'landing_page.dart';
 import 'forgot_password.dart';
-
+import 'email_sent.dart';
+import 'get_notification.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
         '/sign_in_screen' : (context) => SignInScreen(),
         '/sign_up_screen' : (context) => SignUpScreen(),
         '/forgot_password' : (context) =>  ForgotPasswordScreen(),
+        '/email_sent' : (context) =>  ResetEmailSentScreen(), 
+        '/get_notification' : (context) => NotificationOnboardingScreen(),
       },
     );
   }
