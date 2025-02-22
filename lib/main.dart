@@ -5,8 +5,10 @@ import 'sign_in_sign_up.dart';
 import 'landing_page.dart';
 import 'forgot_password.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
+import 'firebase_options.dart';
+import 'email_sent.dart';
+import 'get_notification.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
         '/sign_in_screen' : (context) => SignInScreen(),
         '/sign_up_screen' : (context) => SignUpScreen(),
         '/forgot_password' : (context) =>  ForgotPasswordScreen(),
+        '/email_sent' : (context) =>  ResetEmailSentScreen(), 
+        '/get_notification' : (context) => NotificationOnboardingScreen(),
       },
     );
   }

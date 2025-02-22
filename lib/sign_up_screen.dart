@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+// import '../home_screen.dart'; // Import your HomeScreen after sign-up
 import '../home_screen.dart'; // Import your HomeScreen after sign-up
 
 class SignUpScreen extends StatefulWidget {
@@ -19,40 +20,77 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? selectedCountry;
   bool isLoading = false;
 
+  // Future<void> signUp() async {
+  //   if (!_formKey.currentState!.validate()) return;
+  //   setState(() => isLoading = true);
+
+  //   try {
+  //     UserCredential userCredential =
+  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //       email: _emailController.text.trim(),
+  //       password: _passwordController.text.trim(),
+  //     );
+
+  //     // Store user details in Firestore
+  //     await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(userCredential.user!.uid)
+  //         .set({
+  //       'name': _nameController.text.trim(),
+  //       'phone': _phoneController.text.trim(),
+  //       'email': _emailController.text.trim(),
+  //       'country': selectedCountry ?? '',
+  //       'uid': userCredential.user!.uid,
+  //     });
+
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Error: ${e.toString()}")),
+  //     );
+  //   }
+  //   setState(() => isLoading = false);
+  // }
+
   Future<void> signUp() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => isLoading = true);
+  if (!_formKey.currentState!.validate()) return;
+  setState(() => isLoading = true);
 
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+  try {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-      // Store user details in Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'name': _nameController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'email': _emailController.text.trim(),
-        'country': selectedCountry ?? '',
-        'uid': userCredential.user!.uid,
-      });
+    // Store user details in Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userCredential.user!.uid)
+        .set({
+      'name': _nameController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'email': _emailController.text.trim(),
+      'country': selectedCountry ?? '',
+      'uid': userCredential.user!.uid,
+    });
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
-      );
-    }
-    setState(() => isLoading = false);
+    // Navigate to HomeScreen after successful sign-up
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: ${e.toString()}")),
+    );
   }
+  setState(() => isLoading = false);
+}
+
 
   @override
   Widget build(BuildContext context) {

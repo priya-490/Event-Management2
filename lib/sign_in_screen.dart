@@ -57,34 +57,42 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   // 🔹 Google Sign-In Function
-  Future<void> signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // User canceled sign-in
+Future<void> signInWithGoogle() async {
+  try {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) {
+      print("Google Sign-In canceled");
+      return; // If the user cancels the sign-in
+    }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    // Obtain the auth details
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    // Create a credential
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+    // Sign in to Firebase with the credential
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      if (userCredential.user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      }
-    } catch (e) {
-      print("Google Sign-In Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Google Sign-In failed. Try again.")),
+    if (userCredential.user != null) {
+      // ✅ Navigate to HomeScreen after successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     }
+  } catch (e) {
+    print("Google Sign-In Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Google Sign-In failed: ${e.toString()}")),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
