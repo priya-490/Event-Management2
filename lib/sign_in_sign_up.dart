@@ -13,21 +13,19 @@ class SigninOrSignupScreen extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              Image.network(
-                MediaQuery.of(context).platformBrightness == Brightness.light
-                    ? "https://i.postimg.cc/nz0YBQcH/Logo-light.png"
-                    : "https://i.postimg.cc/MHH0DKv1/Logo-dark.png",
+              Image.asset(
+                "assets/logo.jpg", // Load image from assets
                 height: 146,
+                fit: BoxFit.contain, // Adjust fit if needed
               ),
               const Spacer(),
               ElevatedButton(
                 onPressed: () {
-                 Navigator.pushNamed(context, '/sign_in_screen');
-
+                  Navigator.pushNamed(context, '/sign_in_screen');
                 },
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
-                  backgroundColor: const Color(0xFF00BF6D),
+                  backgroundColor: const Color(0xFFbc6c25),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 48),
                   shape: const StadiumBorder(),
@@ -37,15 +35,15 @@ class SigninOrSignupScreen extends StatelessWidget {
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
-                    Navigator.pushNamed(context, '/sign_up_screen');
-
+                  Navigator.pushNamed(context, '/sign_up_screen');
                 },
                 style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: const StadiumBorder(),
-                    backgroundColor: const Color(0xFFFE9901)),
+                  elevation: 0,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: const StadiumBorder(),
+                  backgroundColor: const Color(0xFFdda15e),
+                ),
                 child: const Text("Sign Up"),
               ),
               const Spacer(flex: 2),
