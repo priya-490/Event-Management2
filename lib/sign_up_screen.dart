@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-// import '../home_screen.dart'; // Import your HomeScreen after sign-up
-import '../home_screen.dart'; // Import your HomeScreen after sign-up
-
+import 'sign_in_screen.dart'; // Import your SignInScreen
+import 'home_screen.dart';
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -20,77 +17,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? selectedCountry;
   bool isLoading = false;
 
-  // Future<void> signUp() async {
-  //   if (!_formKey.currentState!.validate()) return;
-  //   setState(() => isLoading = true);
-
-  //   try {
-  //     UserCredential userCredential =
-  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-  //       email: _emailController.text.trim(),
-  //       password: _passwordController.text.trim(),
-  //     );
-
-  //     // Store user details in Firestore
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(userCredential.user!.uid)
-  //         .set({
-  //       'name': _nameController.text.trim(),
-  //       'phone': _phoneController.text.trim(),
-  //       'email': _emailController.text.trim(),
-  //       'country': selectedCountry ?? '',
-  //       'uid': userCredential.user!.uid,
-  //     });
-
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
-  //     );
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Error: ${e.toString()}")),
-  //     );
-  //   }
-  //   setState(() => isLoading = false);
-  // }
-
-  Future<void> signUp() async {
-  if (!_formKey.currentState!.validate()) return;
-  setState(() => isLoading = true);
-
-  try {
-    UserCredential userCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
-
-    // Store user details in Firestore
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userCredential.user!.uid)
-        .set({
-      'name': _nameController.text.trim(),
-      'phone': _phoneController.text.trim(),
-      'email': _emailController.text.trim(),
-      'country': selectedCountry ?? '',
-      'uid': userCredential.user!.uid,
-    });
-
-    // Navigate to HomeScreen after successful sign-up
+  void navigateToSignIn() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: ${e.toString()}")),
+      MaterialPageRoute(builder: (context) => const SignInScreen()),
     );
   }
-  setState(() => isLoading = false);
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -102,9 +34,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              Image.network(
-                "https://i.postimg.cc/nz0YBQcH/Logo-light.png",
+              Image.asset(
+                "assets/logo.jpg", // Replaced network image with local asset
                 height: 100,
+                fit: BoxFit.contain,
               ),
               const SizedBox(height: 30),
               Text(
@@ -212,10 +145,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: isLoading ? null : signUp,
+                      onPressed: isLoading ? null : navigateToSignIn,
+                      //here i made change 
+    //                   onPressed: isLoading
+    // ? null
+    // : () {
+    //     if (_formKey.currentState!.validate()) {
+    //       Navigator.pushReplacement(
+    //         context,
+    //         MaterialPageRoute(builder: (context) => const HomeScreen()),
+    //       );
+    //     }
+    //   },
+
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
-                        backgroundColor: const Color(0xFF00BF6D),
+                        backgroundColor: const Color(0xFFbc6c25),
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 48),
                         shape: const StadiumBorder(),
@@ -226,16 +171,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/sign_in_screen');
-                      },
+                      onPressed: navigateToSignIn,
                       child: Text.rich(
                         const TextSpan(
                           text: "Already have an account? ",
                           children: [
                             TextSpan(
                               text: "Sign in",
-                              style: TextStyle(color: Color(0xFF00BF6D)),
+                              style: TextStyle(color: Color(0xFFbc6c25)),
                             ),
                           ],
                         ),
@@ -264,8 +207,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
 // Country dropdown list
 List<DropdownMenuItem<String>>? countries = [
-  "Bangladesh",
-  "Switzerland",
+  "India",
+  "Korea",
   'Canada',
   'Japan',
   'Germany',
