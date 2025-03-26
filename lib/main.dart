@@ -75,8 +75,8 @@ class AuthWrapper extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasData) {
-          // return HomeScreen(); // ✅ User is signed in, go to HomeScreen
-          return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
+          return HomeScreen(); // ✅ User is signed in, go to HomeScreen
+          // return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
 
         }
         if (snapshot.hasError) {
