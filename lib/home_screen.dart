@@ -136,7 +136,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               themeProvider.toggleTheme();
             },
-          ),
+          ) ,
           
           // 🔹 Sign Out Button
           IconButton(

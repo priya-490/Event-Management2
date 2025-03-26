@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'sign_in_screen.dart'; 
 // import 'home_screen.dart';
 
@@ -48,6 +49,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Verification email sent! Please check your inbox.')),
       );
+      // Store user details in Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userCredential.user!.uid)
+        .set({
+      'name': _nameController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'email': _emailController.text.trim(),
+      'country': selectedCountry ?? '',
+      'uid': userCredential.user!.uid,
+      });
 
       navigateToSignIn();
     } catch (e) {

@@ -1,103 +1,178 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart';
+import 'add_event.dart';
+import 'event_details.dart';
 
-class AdminDashboard extends StatefulWidget {
+class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
-}
-
-class _AdminDashboardState extends State<AdminDashboard> {
-  final TextEditingController _eventNameController = TextEditingController();
-  final TextEditingController _eventDescriptionController = TextEditingController();
-  final TextEditingController _eventDateController = TextEditingController();
-
-  // Function to create an event in Firestore
-  Future<void> createEvent() async {
-    if (_eventNameController.text.isEmpty ||
-        _eventDescriptionController.text.isEmpty ||
-        _eventDateController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('All fields are required!')),
-      );
-      return;
-    }
-
-    try {
-      await FirebaseFirestore.instance.collection('events').add({
-        'name': _eventNameController.text,
-        'description': _eventDescriptionController.text,
-        'date': _eventDateController.text,
-        'createdAt': Timestamp.now(),
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Event created successfully!')),
-      );
-
-      _eventNameController.clear();
-      _eventDescriptionController.clear();
-      _eventDateController.clear();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating event: $e')),
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor: const Color(0xFFbc6c25),
+        title: const Text("Manage Events"),
+        leading: const Icon(Icons.arrow_back),
+        actions: [
+          Icon(Icons.notifications),
+          SizedBox(width: 16),
+          IconButton(
+            icon: Icon(
+              themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Create Event',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _eventNameController,
-              decoration: const InputDecoration(
-                labelText: 'Event Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _eventDescriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Event Description',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _eventDateController,
-              decoration: const InputDecoration(
-                labelText: 'Event Date (YYYY-MM-DD)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: createEvent,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFbc6c25),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Create Event'),
-            ),
-          ],
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.8,
+          children: List.generate(events.length, (index) {
+            return EventCard(event: events[index]);
+          }),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.purple.shade300,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddEventScreen()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.purple,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.event), label: "Events"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
       ),
     );
   }
 }
+
+class EventCard extends StatelessWidget {
+  final Event event;
+  const EventCard({super.key, required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                color: Colors.grey[300],
+              ),
+              child: const Center(
+                child: Text(
+                  "Image Not Found",
+                  style: TextStyle(fontSize: 12, color: Colors.red),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.calendar_today,
+                      size: 14,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(event.date),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 14, color: Colors.red),
+                    const SizedBox(width: 4),
+                    Text(event.location),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => EventDetailsPage(
+                              title: "Tech Fest 2025",
+                              date: "March 20, 2025",
+                              location: "New York, USA",
+                              attendees: "1.2K",
+                              category: "Technology",
+                              description:
+                                  "Join the biggest tech festival with top industry experts!",
+                              imageUrl:
+                                  "https://source.unsplash.com/400x300/?technology,festival",
+                            ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade100,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text("View Details"),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Event {
+  final String title;
+  final String date;
+  final String location;
+
+  Event({required this.title, required this.date, required this.location});
+}
+
+List<Event> events = [
+  Event(
+    title: "Tech Fest 2025",
+    date: "March 20, 2025",
+    location: "New York, USA",
+  ),
+  Event(
+    title: "Startup Conference",
+    date: "April 5, 2025",
+    location: "San Francisco, USA",
+  ),
+];
