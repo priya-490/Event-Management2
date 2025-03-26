@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.1.1  # or the latest version
+  
   firebase_core: ^3.12.0
   firebase_auth: ^5.5.0
   cloud_firestore: ^5.6.4
@@ -34,5 +36,8 @@ flutter:
     - assets/campus_events.svg
     - assets/register.svg
     - assets/logo.jpg
+    - assets/b.jpeg
+    - assets/c.jpg
+    - assets/google_logo.jpg
 
 

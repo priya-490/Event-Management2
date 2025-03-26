@@ -1,5 +1,10 @@
+
 import 'package:flutter/material.dart';
-import 'home_screen.dart'; // Ensure you import the HomeScreen file
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'home_screen.dart';
+import 'admin_dashboard.dart'; // Import admin dashboard
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -15,6 +20,65 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool isLoading = false;
 
+  // Function to check user role and navigate accordingly
+  Future<void> checkUserRole(User user) async {
+    try {
+      final adminSnapshot = await FirebaseFirestore.instance
+          .collection('AdminEmail')
+          .where('Admin_Email', isEqualTo: user.email)
+          .get();
+
+      if (adminSnapshot.docs.isNotEmpty) {
+        // Navigate to Admin Dashboard if user is an admin
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminDashboard()),
+        );
+      } else {
+        // Navigate to Student Dashboard (HomeScreen) if not an admin
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error checking user role: $e')),
+      );
+    }
+  }
+
+  // Sign-in function with authentication
+  Future<void> signIn() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      User? user = userCredential.user;
+      if (user != null && user.emailVerified) {
+        await checkUserRole(user);
+      } else if (user != null && !user.emailVerified) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please verify your email before signing in'),
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'An error occurred')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,17 +90,16 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               const SizedBox(height: 80),
               Image.asset(
-                "assets/logo.jpg", // Replaced network image with local asset
+                "assets/logo.jpg",
                 height: 100,
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 50),
               Text(
                 "Sign In",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 30),
               Form(
@@ -49,13 +112,18 @@ class _SignInScreenState extends State<SignInScreen> {
                         hintText: 'Email',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
+                      validator:
+                          (value) => value!.isEmpty ? 'Enter your email' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -65,25 +133,24 @@ class _SignInScreenState extends State<SignInScreen> {
                         hintText: 'Password',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
                         ),
                       ),
+                      validator:
+                          (value) => value!.isEmpty ? 'Enter your password' : null,
                     ),
                     const SizedBox(height: 20),
 
-                    // 🔹 Direct Navigation to HomeScreen
                     isLoading
                         ? const CircularProgressIndicator()
                         : ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => HomeScreen()),
-                              );
-                            },
+                            onPressed: signIn,
                             style: ElevatedButton.styleFrom(
                               elevation: 0,
                               backgroundColor: const Color(0xFFbc6c25),
@@ -99,19 +166,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: () {
                         Navigator.pushNamed(context, '/forgot_password');
                       },
-                      child: Text(
-                        'Forgot Password?',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.64),
-                            ),
-                      ),
+                      child: const Text('Forgot Password?'),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/sign_up_screen');
                       },
-                      child: Text.rich(
-                        const TextSpan(
+                      child: const Text.rich(
+                        TextSpan(
                           text: "Don’t have an account? ",
                           children: [
                             TextSpan(
@@ -120,9 +182,6 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ],
                         ),
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.64),
-                            ),
                       ),
                     ),
                   ],

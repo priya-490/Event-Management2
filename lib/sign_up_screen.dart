@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'sign_in_screen.dart'; // Import your SignInScreen
-import 'home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'sign_in_screen.dart'; 
+// import 'home_screen.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -24,6 +27,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  // Sign-up function using Firebase
+  Future<void> signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+
+    try {
+      // Create user with email and password
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // Update display name and phone number using Firebase User
+      await userCredential.user?.updateDisplayName(_nameController.text.trim());
+
+      // Send email verification
+      await userCredential.user?.sendEmailVerification();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Verification email sent! Please check your inbox.')),
+      );
+      // Store user details in Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userCredential.user!.uid)
+        .set({
+      'name': _nameController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'email': _emailController.text.trim(),
+      'country': selectedCountry ?? '',
+      'uid': userCredential.user!.uid,
+      });
+
+      navigateToSignIn();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+
+    setState(() => isLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               const SizedBox(height: 40),
               Image.asset(
-                "assets/logo.jpg", // Replaced network image with local asset
+                "assets/logo.jpg", 
                 height: 100,
                 fit: BoxFit.contain,
               ),
@@ -58,8 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Full Name',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -75,8 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Email',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -93,8 +138,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Phone',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -112,8 +156,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Password',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -135,29 +178,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Country',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
                         ),
                       ),
+                      validator: (value) => value == null ? "Select a country" : null,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: isLoading ? null : navigateToSignIn,
-                      //here i made change 
-    //                   onPressed: isLoading
-    // ? null
-    // : () {
-    //     if (_formKey.currentState!.validate()) {
-    //       Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(builder: (context) => const HomeScreen()),
-    //       );
-    //     }
-    //   },
-
+                      onPressed: isLoading ? null : signUp,
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: const Color(0xFFbc6c25),
