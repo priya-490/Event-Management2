@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart'; // ✅ Import Provider for theme management
-import 'firebase_options.dart';
+import 'FirebaseOptions/firebase_options.dart';
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 
-import 'sign_in_screen.dart';
-import 'sign_up_screen.dart';
-import 'sign_in_sign_up.dart';
-import 'landing_page.dart';
-import 'forgot_password.dart';
-import 'email_sent.dart';
-import 'get_notification.dart';
-import 'home_screen.dart';
-import 'theme_provider.dart'; // ✅ Import ThemeProvider
-
+import 'Authentication/sign_in_screen.dart';
+import 'Authentication/sign_up_screen.dart';
+import 'Authentication/sign_in_sign_up.dart';
+import 'LandingPage/landing_page.dart';
+import 'Authentication/forgot_password.dart';
+import 'Authentication/email_sent.dart';
+import 'LandingPage/get_notification.dart';
+import 'StudentDashboard/home_screen.dart';
+import 'Theme/theme_provider.dart'; // ✅ Import ThemeProvider
+import 'AdminDashboard/admin_dashboard.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -55,6 +55,8 @@ class MyApp extends StatelessWidget {
             '/email_sent': (context) => ResetEmailSentScreen(),
             '/get_notification': (context) => NotificationOnboardingScreen(),
             '/home_screen': (context) => HomeScreen(), // ✅ Fixed route name
+            '/admin_dashboard': (context) => AdminDashboard(), // ✅ Fixed route name
+
           },
         );
       },
@@ -73,7 +75,9 @@ class AuthWrapper extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasData) {
-          return HomeScreen(); // ✅ User is signed in, go to HomeScreen
+          // return HomeScreen(); // ✅ User is signed in, go to HomeScreen
+          return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
+
         }
         if (snapshot.hasError) {
           return Center(child: Text('Something went wrong!'));

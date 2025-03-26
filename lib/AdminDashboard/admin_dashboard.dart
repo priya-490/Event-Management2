@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'theme_provider.dart';
+import '../Theme/theme_provider.dart';
 import 'add_event.dart';
 import 'event_details.dart';
 

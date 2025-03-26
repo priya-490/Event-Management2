@@ -92,9 +92,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'theme_provider.dart';
+import '../Theme/theme_provider.dart';
 import 'event_box.dart';
-import 'landing_page.dart'; // Import the Landing Page for redirection
+import '../LandingPage/landing_page.dart'; // Import the Landing Page for redirection
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

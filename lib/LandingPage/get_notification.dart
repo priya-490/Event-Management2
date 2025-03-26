@@ -82,16 +82,16 @@ class _NotificationOnboardingScreenState
                         alignment: Alignment.center,
                         children: [
                           imageWidget(
-                            "assets/notification_bg.png",
+                            "assets/notification1.svg",
                           ), // Background
                           Positioned(
                             top: 10, // Adjust as needed
                             child: SizedBox(
                               width: 200, // Increase width
                               height: 200, // Increase height
-                              child: imageWidget(
-                                "assets/notification1.svg",
-                              ), // Foreground SVG
+                              // child: imageWidget(
+                              //   "assets/notification1.svg",
+                              // ), // Foreground SVG
                             ),
                           ),
                         ],

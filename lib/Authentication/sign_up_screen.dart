@@ -57,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       'name': _nameController.text.trim(),
       'phone': _phoneController.text.trim(),
       'email': _emailController.text.trim(),
-      'country': selectedCountry ?? '',
+      // 'country': selectedCountry ?? '',
       'uid': userCredential.user!.uid,
       });
 
@@ -167,26 +167,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           : null,
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField(
-                      value: selectedCountry,
-                      items: countries,
-                      icon: const Icon(Icons.expand_more),
-                      onChanged: (value) {
-                        setState(() => selectedCountry = value);
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Country',
-                        filled: true,
-                        fillColor: Color(0xFFF5FCF9),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                        ),
-                      ),
-                      validator: (value) => value == null ? "Select a country" : null,
-                    ),
-                    const SizedBox(height: 16),
+                   
                     ElevatedButton(
                       onPressed: isLoading ? null : signUp,
                       style: ElevatedButton.styleFrom(
@@ -236,15 +217,3 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-// Country dropdown list
-List<DropdownMenuItem<String>>? countries = [
-  "India",
-  "Korea",
-  'Canada',
-  'Japan',
-  'Germany',
-  'Australia',
-  'Sweden',
-].map<DropdownMenuItem<String>>((String value) {
-  return DropdownMenuItem<String>(value: value, child: Text(value));
-}).toList();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // ✅ Import Provider
-import 'theme_provider.dart'; // ✅ Import ThemeProvider
+import '../Theme/theme_provider.dart'; // ✅ Import ThemeProvider
 
 class EventBox extends StatelessWidget {
   final String title;

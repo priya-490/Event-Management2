@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'home_screen.dart';
-import 'admin_dashboard.dart'; // Import admin dashboard
+import '../StudentDashboard/home_screen.dart';
+import '../AdminDashboard/admin_dashboard.dart'; // Import admin dashboard
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
