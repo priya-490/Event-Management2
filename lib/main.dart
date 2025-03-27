@@ -1,3 +1,6 @@
+// event category is pending, approved , rejected
+// when the admin approves the event, the status of the event will be changes to approved
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,7 +19,9 @@ import 'Authentication/email_sent.dart';
 import 'LandingPage/get_notification.dart';
 import 'StudentDashboard/home_screen.dart';
 import 'Theme/theme_provider.dart'; // ✅ Import ThemeProvider
-import 'AdminDashboard/admin_dashboard.dart';
+// import 'Student_Clubs_Dashboard/admin_dashboard.dart';
+import 'AdminDashboard/cur_admin_dashboard.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -54,8 +59,9 @@ class MyApp extends StatelessWidget {
             '/forgot_password': (context) => ForgotPasswordScreen(),
             '/email_sent': (context) => ResetEmailSentScreen(),
             '/get_notification': (context) => NotificationOnboardingScreen(),
-            '/home_screen': (context) => HomeScreen(), // ✅ Fixed route name
-            '/admin_dashboard': (context) => AdminDashboard(), // ✅ Fixed route name
+            'home_screen': (context) => HomeScreen(), // ✅ Fixed route name
+            // '/admin_dashboard': (context) => AdminDashboard(), // ✅ Fixed route name
+            '/cur_admin_dashboard': (context) => AdminDashboard(), // ✅ Fixed route name
 
           },
         );
@@ -75,7 +81,7 @@ class AuthWrapper extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasData) {
-          return HomeScreen(); // ✅ User is signed in, go to HomeScreen
+          return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
           // return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
 
         }
@@ -83,7 +89,9 @@ class AuthWrapper extends StatelessWidget {
           return Center(child: Text('Something went wrong!'));
         }
 
-        return const OnboardingScreen(); // ✅ User is not signed in, go to Sign-In/Sign-Up page
+        // return const OnboardingScreen(); // ✅ User is not signed in, go to Sign-In/Sign-Up page
+          return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
+
       },
     );
   }

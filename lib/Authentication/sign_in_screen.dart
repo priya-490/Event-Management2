@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../StudentDashboard/home_screen.dart';
-import '../AdminDashboard/admin_dashboard.dart'; // Import admin dashboard
+import '../AdminDashboard/cur_admin_dashboard.dart'; // Import admin dashboard
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
