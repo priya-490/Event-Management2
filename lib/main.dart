@@ -81,16 +81,17 @@ class AuthWrapper extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasData) {
-          return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
           // return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
+          // return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
+        return const OnboardingScreen(); // ✅ User is not signed in, go to Sign-In/Sign-Up page
 
         }
         if (snapshot.hasError) {
           return Center(child: Text('Something went wrong!'));
         }
 
-        // return const OnboardingScreen(); // ✅ User is not signed in, go to Sign-In/Sign-Up page
-          return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
+        return const OnboardingScreen(); // ✅ User is not signed in, go to Sign-In/Sign-Up page
+          // return AdminDashboard(); // ✅ User is signed in, go to HomeScreen
 
       },
     );
