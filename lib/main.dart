@@ -16,7 +16,7 @@ import 'Authentication/email_sent.dart';
 import 'LandingPage/get_notification.dart';
 import 'StudentDashboard/home_screen.dart';
 import 'Theme/theme_provider.dart'; // ✅ Import ThemeProvider
-import 'AdminDashboard/admin_dashboard.dart';
+import 'Clubs/club_dashboard.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
