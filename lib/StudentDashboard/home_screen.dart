@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../Theme/theme_provider.dart';
 import 'event_box.dart';
 import '../LandingPage/landing_page.dart'; // Import the Landing Page for redirection
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,27 +12,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-
-    final List<Map<String, String>> events = [
-      {
-        "title": "Tech Conference 2025",
-        "date": "March 15, 2025",
-        "attendees": "500+",
-        "image": "assets/b.jpeg",
-        "location": "New York",
-        "description": "A gathering of top tech minds to discuss the future.",
-        "category": "Technology",
-      },
-      {
-        "title": "Music Fest 2025",
-        "date": "April 10, 2025",
-        "attendees": "1000+",
-        "image": "assets/c.jpg",
-        "location": "Los Angeles",
-        "description": "Enjoy a night filled with music and entertainment.",
-        "category": "Entertainment",
-      },
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -41,12 +21,14 @@ class HomeScreen extends StatelessWidget {
         actions: [
           // 🔹 Toggle Theme Button
           IconButton(
-            icon: Icon(themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            icon: Icon(
+              themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+            ),
             onPressed: () {
               themeProvider.toggleTheme();
             },
-          ) ,
-          
+          ),
+
           // 🔹 Sign Out Button
           IconButton(
             icon: const Icon(Icons.logout),
@@ -56,7 +38,9 @@ class HomeScreen extends StatelessWidget {
                 // Navigate to Landing Page after Sign Out
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const OnboardingScreen(),
+                  ),
                   (route) => false,
                 );
               }
@@ -65,23 +49,56 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      
-      body: ListView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          final event = events[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: EventBox(
-              title: event["title"]!,
-              date: event["date"]!,
-              attendees: event["attendees"]!,
-              image: event["image"]!,
-              location: event["location"]!,
-              description: event["description"]!,
-              category: event["category"]!,
-            ),
+
+      // Fetch Events from Firestore
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('events')
+        .where('status' , isEqualTo: 'approved')
+        .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No events available."));
+          }
+
+          final events = snapshot.data!.docs;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(10),
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              final eventData = events[index].data() as Map<String, dynamic>;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: EventBox(
+                  title: eventData["Event Name"] ?? "No Title",
+                  // date: eventData["Start Date"] ?? "No Date",
+                  // date: (eventData['Start Date'] as Timestamp).toDate(), // ✅ Convert here
+                  date:
+                      eventData['Start Date'] is Timestamp
+                          ? (eventData['Start Date'] as Timestamp).toDate()
+                          : DateTime.tryParse(
+                                eventData['Start Date'].toString(),
+                              ) ??
+                              DateTime.now(),
+
+                  // attendees: eventData["attendees"] ?? "Unknown",
+                  attendees:
+                      (eventData["ParticipantsId"] is List)
+                          ? (eventData["ParticipantsId"] as List).length
+                          : 0,
+
+                  image: eventData["image"] ?? "assets/default.jpg",
+                  venue: eventData["Event Venue"] ?? "Unknown Location",
+                  description:
+                      eventData["Event Description"] ?? "No Description",
+                  club: eventData["club"] ?? "General",
+                ),
+              );
+            },
           );
         },
       ),

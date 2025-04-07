@@ -21,6 +21,7 @@ dependencies:
   firebase_storage: ^12.4.3
   firebase_messaging: ^15.2.3
   flutter_svg: ^2.0.17
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
@@ -40,5 +41,13 @@ flutter:
     - assets/c.jpg
     - assets/a.jpeg
     - assets/google_logo.jpg
+    - assets/d.jpeg
+    - assets/d.jpg
+    - assets/e.jpg
+    - assets/cultinter.jpg
+    - assets/Eidwishes.jpg
+    - assets/fest_event.jpeg
+    - assets/gc.jpeg
+    - assets/IMAGINE.png
 
-
+    

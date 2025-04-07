@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../StudentDashboard/home_screen.dart';
+import '../StudentDashboard/main_screen.dart';
 import '../AdminDashboard/cur_admin_dashboard.dart'; // Import admin dashboard
 
 class SignInScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _SignInScreenState extends State<SignInScreen> {
         // Navigate to Student Dashboard (HomeScreen) if not an admin
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       }
     } catch (e) {

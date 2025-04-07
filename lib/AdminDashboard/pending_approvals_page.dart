@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'EventDetailPage.dart';
+import 'package:intl/intl.dart';
 
 class PendingApprovalsPage extends StatelessWidget {
   const PendingApprovalsPage({Key? key}) : super(key: key);
@@ -23,10 +23,11 @@ class PendingApprovalsPage extends StatelessWidget {
               ),
             ),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('events')
-                  .where('status', isEqualTo: 'pending')
-                  .snapshots(),
+              stream:
+                  FirebaseFirestore.instance
+                      .collection('events')
+                      .where('status', isEqualTo: 'pending')
+                      .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -51,7 +52,11 @@ class PendingApprovalsPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset('assets/a.jpeg', height: 150, fit: BoxFit.cover),
+                          Image.asset(
+                            'assets/a.jpeg',
+                            height: 150,
+                            fit: BoxFit.cover,
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
@@ -59,12 +64,26 @@ class PendingApprovalsPage extends StatelessWidget {
                               children: [
                                 Text(
                                   event['Event Name'] ?? 'Unnamed Event',
-                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                Text('Venue: ${event['Event Venue'] ?? 'Unknown'}'),
-                                Text('Start Date: ${event['Start Date'].toDate()}'),
-                                Text('End Date: ${event['End Date'].toDate()}'),
-                                Text('Price: ₹${event['Payment Info']['price']}'),
+                                Text(
+                                  'Venue: ${event['Event Venue'] ?? 'Unknown'}',
+                                ),
+                                // Text('Start Date: ${event['Start Date'].toDate()}'),
+                                // Text('End Date: ${event['End Date'].toDate()}'),
+                                Text(
+                                  'Start Date: ${_formatDate(event['Start Date'])}',
+                                ),
+                                Text(
+                                  'End Date: ${_formatDate(event['End Date'])}',
+                                ),
+
+                                Text(
+                                  'Price: ₹${event['Payment Info']['price']}',
+                                ),
                               ],
                             ),
                           ),
@@ -75,7 +94,9 @@ class PendingApprovalsPage extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => EventDetailPage(event: event),
+                                      builder:
+                                          (context) =>
+                                              EventDetailPage(event: event),
                                     ),
                                   );
                                 },
@@ -100,10 +121,11 @@ class PendingApprovalsPage extends StatelessWidget {
               ),
             ),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('approved_clubs')
-                  .where('status', isEqualTo: 'pending')
-                  .snapshots(),
+              stream:
+                  FirebaseFirestore.instance
+                      .collection('approved_clubs')
+                      .where('status', isEqualTo: 'pending')
+                      .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -132,7 +154,10 @@ class PendingApprovalsPage extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.check, color: Colors.green),
+                              icon: const Icon(
+                                Icons.check,
+                                color: Colors.green,
+                              ),
                               onPressed: () async {
                                 await FirebaseFirestore.instance
                                     .collection('approved_clubs')
@@ -162,4 +187,18 @@ class PendingApprovalsPage extends StatelessWidget {
       ),
     );
   }
+  String _formatDate(dynamic date) {
+  final formatter = DateFormat('dd MMM yyyy');
+
+  if (date is Timestamp) {
+    return formatter.format(date.toDate());
+  } else if (date is String) {
+    try {
+      return formatter.format(DateTime.parse(date));
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+  return 'Unknown';
+}
 }
