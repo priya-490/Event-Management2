@@ -1,6 +1,6 @@
-# event_manage
+# EventEase -> Campus Events Management App
 
-A new Flutter project.
+
 
 ## Getting Started
 
