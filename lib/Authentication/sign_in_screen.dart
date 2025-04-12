@@ -1,11 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../StudentDashboard/main_screen.dart';
-// import '../AdminDashboard/cur_admin_dashboard.dart'; // Import admin dashboard
-import '../Student_Clubs_Dashboard/club_dashboard.dart'; // Import admin dashboard
+import '../AdminDashboard/cur_admin_dashboard.dart'; // Import admin dashboard
+import '../Student_Clubs_Dashboard/club_dashboard.dart'; // Import club rep dashboard
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -24,10 +23,15 @@ class _SignInScreenState extends State<SignInScreen> {
   // Function to check user role and navigate accordingly
   Future<void> checkUserRole(User user) async {
     try {
-      final adminSnapshot = await FirebaseFirestore.instance
-          .collection('AdminEmail')
-          .where('Admin_Email', isEqualTo: user.email)
-          .get();
+      final adminSnapshot =
+          await FirebaseFirestore.instance
+              .collection('AdminEmail')
+              .where('Admin_Email', isEqualTo: user.email)
+              .get();
+      // final clubSnapshot = await FirebaseFirestore.instance
+      //     .collection('approved_clubs')
+      //     .where('Club Email', isEqualTo: user.email)
+      //     .get();
 
       if (adminSnapshot.docs.isNotEmpty) {
         // Navigate to Admin Dashboard if user is an admin
@@ -35,7 +39,15 @@ class _SignInScreenState extends State<SignInScreen> {
           context,
           MaterialPageRoute(builder: (context) => const AdminDashboard()),
         );
-      } else {
+      }
+      // else if (clubSnapshot.docs.isNotEmpty) {
+      //   // Navigate to Admin Dashboard if user is an admin
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => const ClubDashboard()),
+      //   );
+      // }
+      else {
         // Navigate to Student Dashboard (HomeScreen) if not an admin
         Navigator.pushReplacement(
           context,
@@ -43,9 +55,9 @@ class _SignInScreenState extends State<SignInScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error checking user role: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error checking user role: $e')));
     }
   }
 
@@ -57,24 +69,38 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
       User? user = userCredential.user;
-      if (user != null && user.emailVerified) {
-        await checkUserRole(user);
-      } else if (user != null && !user.emailVerified) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please verify your email before signing in'),
-          ),
-        );
+      if (user != null) {
+        final clubSnapshot =
+            await FirebaseFirestore.instance
+                .collection('approved_clubs')
+                .where('Club Email', isEqualTo: user.email)
+                .get();
+
+        if (clubSnapshot.docs.isNotEmpty) {
+          // Navigate to Admin Dashboard if user is an admin
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ClubDashboard()),
+          );
+        } else if (user != null && user.emailVerified) {
+          await checkUserRole(user);
+        } else if (user != null && !user.emailVerified) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please verify your email before signing in'),
+            ),
+          );
+        }
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'An error occurred')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? 'An error occurred')));
     } finally {
       setState(() => isLoading = false);
     }
@@ -90,11 +116,7 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Column(
             children: [
               const SizedBox(height: 80),
-              Image.asset(
-                "assets/logo.jpg",
-                height: 100,
-                fit: BoxFit.contain,
-              ),
+              Image.asset("assets/logo.jpg", height: 100, fit: BoxFit.contain),
               const SizedBox(height: 50),
               Text(
                 "Sign In",
@@ -144,23 +166,24 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       validator:
-                          (value) => value!.isEmpty ? 'Enter your password' : null,
+                          (value) =>
+                              value!.isEmpty ? 'Enter your password' : null,
                     ),
                     const SizedBox(height: 20),
 
                     isLoading
                         ? const CircularProgressIndicator()
                         : ElevatedButton(
-                            onPressed: signIn,
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: const Color(0xFFbc6c25),
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(double.infinity, 48),
-                              shape: const StadiumBorder(),
-                            ),
-                            child: const Text("Sign in"),
+                          onPressed: signIn,
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: const Color(0xFFbc6c25),
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 48),
+                            shape: const StadiumBorder(),
                           ),
+                          child: const Text("Sign in"),
+                        ),
                     const SizedBox(height: 16),
 
                     TextButton(

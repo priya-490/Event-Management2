@@ -7,14 +7,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
-class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+class ClubDashboard extends StatefulWidget {
+  const ClubDashboard({super.key});
 
   @override
-  _AdminDashboardState createState() => _AdminDashboardState();
+  _ClubDashboardState createState() => _ClubDashboardState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _ClubDashboardState extends State<ClubDashboard> {
   List<Event> events = []; // State variable to store events
 
   @override
@@ -28,7 +28,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
     try {
       //String userId = FirebaseAuth.instance.currentUser?.email ?? "";
       //String clubName = userId.split('@')[0]; // Extract "club" from "club@iitrpr.ac.in"
-      String clubName = "Dcypher";
+      final String? userEmail = FirebaseAuth.instance.currentUser?.email;
+      if (userEmail == null) {
+        return;
+      }
+
+      // get the club name associated with the logged in club rep
+      final clubQuery =
+          await FirebaseFirestore.instance
+              .collection('approved_clubs')
+              .where('Club Email', isEqualTo: userEmail)
+              .get();
+
+      if (clubQuery.docs.isEmpty) return;
+
+      final clubName = clubQuery.docs.first.data()['Club Name'];
+      //debugging
+     print("\n ###Fetched club name: '$clubName'\n");
+
+      // String clubName = "Dcypher";
+
+//debugging
+final eventsSnapshot = await FirebaseFirestore.instance.collection('events').get();
+for (var doc in eventsSnapshot.docs) {
+  print("\n ###Event: ${doc.data()['Event Name']}, club: '${doc.data()['club']}' \n");
+}
+
       // Fetch events only for this club
       QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance
@@ -261,7 +286,7 @@ class EventCard extends StatelessWidget {
                               eventDescription: event.eventDescription,
                               eventImage: event.eventImage,
                               status: event.status,
-                              documentId: event.documentId
+                              documentId: event.documentId,
                             ),
                       ),
                     );
@@ -315,34 +340,77 @@ class Event {
     required this.userId,
   });
 
-  factory Event.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
-    // Handle cases where key has spaces like "payment Info"
-  Map<String, dynamic> paymentInfo =
-      data['Payment Info'] as Map<String, dynamic>? ?? {};
+//   factory Event.fromFirestore(DocumentSnapshot doc) {
+//   Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
+//   Map<String, dynamic> paymentInfo =
+//       data['Payment Info'] as Map<String, dynamic>? ?? {};
 
+//   return Event(
+//     documentId: doc.id,
+//     eventName: data['Event Name'] ?? 'Unnamed Event',
+//     eventDescription: data['Event Description'] ?? 'No Description',
+//     startDate: data['Start Date'] is Timestamp
+//         ? (data['Start Date'] as Timestamp).toDate()
+//         : DateTime.tryParse(data['Start Date'].toString()) ?? DateTime.now(),
+//     endDate: data['End Date'] is Timestamp
+//         ? (data['End Date'] as Timestamp).toDate()
+//         : DateTime.tryParse(data['End Date'].toString()) ?? DateTime.now(),
+//     eventVenue: data['Event Venue'] ?? 'Venue not mentioned',
+//     // eventImage: data['image'] ?? '',
+//     eventImage: data['image'] is List
+//     ? (data['image'] as List).isNotEmpty
+//         ? (data['image'] as List).first.toString()
+//         : ''
+//     : data['image']?.toString() ?? '',
 
+//     attendees: (data['attendees'] as num?)?.toInt() ?? 0,
+//     isPaid: paymentInfo['isPaid'] ?? false,
+//     price: (paymentInfo['price'] as num?)?.toDouble() ?? 0.0,
+//     club: data['club'] ?? 'Not Set',
+//     status: data['status'] ?? 'pending',
+//     userId: data['userId'] ?? '',
+//   );
+// }
 
-    return Event(
-      documentId: doc.id,
-      eventName: data['Event Name'] ?? 'Unnamed Event',
-      eventDescription: data['Event Description'] ?? 'No Description',
-      startDate:
-          data['Start Date'] != null
-              ? DateTime.tryParse(data['Start Date']) ?? DateTime.now()
-              : DateTime.now(),
-      endDate:
-          data['End Date'] != null
-              ? DateTime.tryParse(data['End Date']) ?? DateTime.now()
-              : DateTime.now(),
-      eventVenue: data['Event Venue'] ?? 'Venue not mentioned',
-      eventImage: data['image'] ?? '', // Allow empty image if null
-      attendees: (data['attendees'] as num?)?.toInt() ?? 0, // Convert safely
-      isPaid: paymentInfo['isPaid'] ?? false, // Fetch from nested field
-    price: (paymentInfo['price'] as num?)?.toDouble() ?? 0.0, // Fetch from nested field
-      club: data['club'] ?? 'Not Set',
-      status: data['status'] ?? 'pending',
-      userId: data['userId'] ?? '', // Provide default empty string
-    );
-  }
+factory Event.fromFirestore(DocumentSnapshot doc) {
+  Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
+  Map<String, dynamic> paymentInfo = data['Payment Info'] as Map<String, dynamic>? ?? {};
+
+  return Event(
+    documentId: doc.id,
+    eventName: data['Event Name']?.toString() ?? 'Unnamed Event',
+    eventDescription: data['Event Description']?.toString() ?? 'No Description',
+    startDate: data['Start Date'] is Timestamp
+        ? (data['Start Date'] as Timestamp).toDate()
+        : DateTime.tryParse(data['Start Date'].toString()) ?? DateTime.now(),
+    endDate: data['End Date'] is Timestamp
+        ? (data['End Date'] as Timestamp).toDate()
+        : DateTime.tryParse(data['End Date'].toString()) ?? DateTime.now(),
+
+    eventVenue: data['Event Venue'] is List
+        ? (data['Event Venue'] as List).isNotEmpty
+            ? (data['Event Venue'] as List).first.toString()
+            : 'Venue not mentioned'
+        : data['Event Venue']?.toString() ?? 'Venue not mentioned',
+
+    eventImage: data['image'] is List
+        ? (data['image'] as List).isNotEmpty
+            ? (data['image'] as List).first.toString()
+            : ''
+        : data['image']?.toString() ?? '',
+
+    club: data['club'] is List
+        ? (data['club'] as List).isNotEmpty
+            ? (data['club'] as List).first.toString()
+            : 'Not Set'
+        : data['club']?.toString() ?? 'Not Set',
+
+    attendees: (data['attendees'] as num?)?.toInt() ?? 0,
+    isPaid: paymentInfo['isPaid'] ?? false,
+    price: (paymentInfo['price'] as num?)?.toDouble() ?? 0.0,
+    status: data['status']?.toString() ?? 'pending',
+    userId: data['userId']?.toString() ?? '',
+  );
+}
+
 }
