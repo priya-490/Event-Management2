@@ -1,8 +1,12 @@
+import 'package:event_manage/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart'; // ✅ Import Provider for theme management
 import 'FirebaseOptions/firebase_options.dart';
+import 'home_page.dart';
+
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
@@ -17,6 +21,9 @@ import 'LandingPage/get_notification.dart';
 import 'StudentDashboard/home_screen.dart';
 import 'Theme/theme_provider.dart'; // ✅ Import ThemeProvider
 import 'AdminDashboard/admin_dashboard.dart';
+import 'StudentDashboard/user_dashboard.dart';
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -56,7 +63,8 @@ class MyApp extends StatelessWidget {
             '/get_notification': (context) => NotificationOnboardingScreen(),
             '/home_screen': (context) => HomeScreen(), // ✅ Fixed route name
             '/admin_dashboard': (context) => AdminDashboard(), // ✅ Fixed route name
-
+            '/user_dashboard' : (context) => UserDashboardScreen() ,
+            
           },
         );
       },
@@ -84,6 +92,8 @@ class AuthWrapper extends StatelessWidget {
         }
 
         return const OnboardingScreen(); // ✅ User is not signed in, go to Sign-In/Sign-Up page
+
+    
       },
     );
   }
