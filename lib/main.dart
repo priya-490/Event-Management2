@@ -16,7 +16,7 @@ import 'Authentication/sign_in_sign_up.dart';
 import 'LandingPage/landing_page.dart';
 import 'Authentication/forgot_password.dart';
 import 'Authentication/email_sent.dart';
-import 'LandingPage/get_notification.dart';
+import 'services/get_notification.dart';
 import 'StudentDashboard/home_screen.dart';
 import 'Theme/theme_provider.dart'; // ✅ Import ThemeProvider
 // import 'Student_Clubs_Dashboard/admin_dashboard.dart';
