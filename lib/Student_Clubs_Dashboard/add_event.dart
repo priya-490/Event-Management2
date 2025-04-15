@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Theme/theme_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddEventScreen extends StatefulWidget {
   const AddEventScreen({super.key});
@@ -12,15 +14,24 @@ class AddEventScreen extends StatefulWidget {
 class _AddEventScreenState extends State<AddEventScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  String documentId = '';
   String eventName = '';
   String eventDescription = '';
+  String eventVenue = '';
   DateTime? startDate;
   DateTime? endDate;
   String eventLocation = '';
+  String club = '';
   TimeOfDay? startTime;
   TimeOfDay? endTime;
   bool isPaid = false;
   double eventFee = 0.0;
+  bool isApproved = false; // Added isApproved field
+
+  // function for combining date and time
+  DateTime combineDateAndTime(DateTime date, TimeOfDay time) {
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
@@ -84,15 +95,35 @@ class _AddEventScreenState extends State<AddEventScreen> {
           key: _formKey,
           child: ListView(
             children: [
-              const Text("Event Name", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Event Name",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               TextFormField(
                 decoration: const InputDecoration(border: OutlineInputBorder()),
-                validator: (value) => value!.isEmpty ? 'Please enter event name' : null,
+                validator:
+                    (value) =>
+                        value!.isEmpty ? 'Please enter event name' : null,
                 onSaved: (value) => eventName = value!,
               ),
               const SizedBox(height: 16),
 
-              const Text("Event Description", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Club Name",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextFormField(
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                validator:
+                    (value) => value!.isEmpty ? 'Please enter club name' : null,
+                onSaved: (value) => club = value!,
+              ),
+              const SizedBox(height: 16),
+
+              const Text(
+                "Event Description",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               TextFormField(
                 decoration: const InputDecoration(border: OutlineInputBorder()),
                 maxLines: 3,
@@ -106,10 +137,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Start Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          "Start Date",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         ElevatedButton(
                           onPressed: () => _selectDate(context, true),
-                          child: Text(startDate == null ? 'Select Start Date' : '${startDate!.toLocal()}'.split(' ')[0]),
+                          child: Text(
+                            startDate == null
+                                ? 'Select Start Date'
+                                : '${startDate!.toLocal()}'.split(' ')[0],
+                          ),
                         ),
                       ],
                     ),
@@ -119,10 +157,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("End Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          "End Date",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         ElevatedButton(
                           onPressed: () => _selectDate(context, false),
-                          child: Text(endDate == null ? 'Select End Date' : '${endDate!.toLocal()}'.split(' ')[0]),
+                          child: Text(
+                            endDate == null
+                                ? 'Select End Date'
+                                : '${endDate!.toLocal()}'.split(' ')[0],
+                          ),
                         ),
                       ],
                     ),
@@ -137,10 +182,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Start Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          "Start Time",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         ElevatedButton(
                           onPressed: () => _selectTime(context, true),
-                          child: Text(startTime == null ? 'Start Time' : startTime!.format(context)),
+                          child: Text(
+                            startTime == null
+                                ? 'Start Time'
+                                : startTime!.format(context),
+                          ),
                         ),
                       ],
                     ),
@@ -150,10 +202,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("End Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          "End Time",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         ElevatedButton(
                           onPressed: () => _selectTime(context, false),
-                          child: Text(endTime == null ? 'End Time' : endTime!.format(context)),
+                          child: Text(
+                            endTime == null
+                                ? 'End Time'
+                                : endTime!.format(context),
+                          ),
                         ),
                       ],
                     ),
@@ -161,13 +220,18 @@ class _AddEventScreenState extends State<AddEventScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-
-              const Text("Event Venue", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Event Venue",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               TextFormField(
                 decoration: const InputDecoration(border: OutlineInputBorder()),
-                validator: (value) => value!.isEmpty ? 'Please enter event venue' : null,
-                onSaved: (value) => eventLocation = value!,
+                validator:
+                    (value) =>
+                        value!.isEmpty ? 'Please enter event Venue' : null,
+                onSaved: (value) => eventVenue = value!,
               ),
+
               const SizedBox(height: 16),
 
               Row(
@@ -182,7 +246,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
               if (isPaid)
                 TextFormField(
-                  decoration: const InputDecoration(hintText: "Enter fee amount", border: OutlineInputBorder()),
+                  decoration: const InputDecoration(
+                    hintText: "Enter fee amount",
+                    border: OutlineInputBorder(),
+                  ),
                   keyboardType: TextInputType.number,
                   onSaved: (value) => eventFee = double.parse(value!),
                 ),
@@ -195,7 +262,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple.shade300,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 12,
+                    ),
                   ),
                   child: const Text("Create Event"),
                 ),
@@ -207,15 +277,57 @@ class _AddEventScreenState extends State<AddEventScreen> {
     );
   }
 
-
-void _saveEvent() {
+  void _saveEvent() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Event '$eventName' added successfully!")),
-      );
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        //  'userId': FirebaseAuth.instance.currentUser?.email ?? "";
+        final userId = user?.uid ?? "";
+
+        await FirebaseFirestore.instance.collection('events').add({
+          'Event Name': eventName,
+          'Event Description': eventDescription,
+          'Event Venue': eventVenue,
+          'Start Date':
+              (startDate != null && startTime != null)
+                  ? combineDateAndTime(startDate!, startTime!).toIso8601String()
+                  : null,
+
+          'End Date':
+              (endDate != null && endTime != null)
+                  ? combineDateAndTime(endDate!, endTime!).toIso8601String()
+                  : null,
+
+          // 'startTime': startTime?.format(context),
+          // 'endTime': endTime?.format(context),
+          // 'location': eventLocation,
+          'club': club,
+          'Payment Info': {
+            // Nest isPaid and eventFee inside paymentInfo
+            'isPaid': isPaid,
+            'price': isPaid ? eventFee : 0,
+          },
+          'ParticipantsId': [],
+          // 'eventFee': isPaid ? eventFee : 0.0,
+          'status': "pending", // Set to false by default
+          'createdAt': Timestamp.now(),
+          'clubId': userId,
+
+          // 'userId': FirebaseAuth.instance.currentUser?.email ?? "",
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Event added successfully!")),
+        );
+
+        Navigator.pop(context); // Go back after saving
+      } catch (error) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed to add event: $error")));
+      }
     }
   }
-
 }

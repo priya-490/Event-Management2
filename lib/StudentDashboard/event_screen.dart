@@ -1,8 +1,33 @@
+<<<<<<< HEAD
+=======
+// import 'package:flutter/material.dart';
+
+// class EventsPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Events"),
+//         centerTitle: true,
+//         backgroundColor: const Color(0xFF6A0DAD),
+//       ),
+//       body: const Center(
+//         child: Text("Welcome to the Events Page"),
+//       ),
+//     );
+//   }
+// }
+
+// this is the events page created by bhavana (right now no use to me)
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Theme/theme_provider.dart';
 import 'dart:async';
+<<<<<<< HEAD
 import 'club_list_page.dart';
+=======
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -13,8 +38,13 @@ class EventsPage extends StatefulWidget {
 
 class _EventsPageState extends State<EventsPage> {
   final List<String> eventBanners = const [
+<<<<<<< HEAD
     '../assets/Eidwishes.jpg',
     '../assets/IMAGINE.png',
+=======
+    'assets/Eidwishes.jpg',
+    'assets/IMAGINE.png',
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
     'assets/event_banner_3.jpg',
   ];
   late PageController _pageController;
@@ -53,9 +83,15 @@ class _EventsPageState extends State<EventsPage> {
   final List<String> eventCategories = const ["BOLA", "BOST", "BOCA", "BOWA", "BOSA"];
 
   final List<String> eventTypes = const [
+<<<<<<< HEAD
     '../assets/fest_event.jpeg',  // Event type 1
     '../assets/gc.jpeg',  // Event type 2
     '../assets/cultinter.jpg',  // Event type 3
+=======
+    'assets/fest_event.jpeg',  // Event type 1
+    'assets/gc.jpeg',  // Event type 2
+    'assets/cultinter.jpg',  // Event type 3
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
   ];
 
   @override
@@ -139,10 +175,14 @@ class _EventsPageState extends State<EventsPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: GestureDetector(
+<<<<<<< HEAD
                       onTap: () {Navigator.push(context,MaterialPageRoute(
                         builder: (context) => ClubListPage(categoryKey: eventCategories[index].toLowerCase()),
                         ),)
                         ;},
+=======
+                      onTap: () {},
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
@@ -213,6 +253,7 @@ class _EventsPageState extends State<EventsPage> {
 }
 
 
+<<<<<<< HEAD
 // import 'package:flutter/material.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 // import '../Theme/theme_provider.dart';
@@ -941,3 +982,5 @@ class _EventsPageState extends State<EventsPage> {
 // //   }
 // // }
 
+=======
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86

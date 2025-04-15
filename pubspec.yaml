@@ -22,7 +22,10 @@ dependencies:
   firebase_storage: ^12.4.3
   firebase_messaging: ^15.2.3
   flutter_svg: ^2.0.17
+
   carousel_slider: ^4.2.1  # ✅ Add this line (latest version)
+
+  intl: ^0.18.1
 
 
 dev_dependencies:
@@ -41,8 +44,20 @@ flutter:
     - assets/logo.jpg
     - assets/b.jpeg
     - assets/c.jpg
+    - assets/a.jpeg
     - assets/google_logo.jpg
+
     - assets/click.mp3
 
 
+    - assets/d.jpeg
+    - assets/d.jpg
+    - assets/e.jpg
+    - assets/cultinter.jpg
+    - assets/Eidwishes.jpg
+    - assets/fest_event.jpeg
+    - assets/gc.jpeg
+    - assets/IMAGINE.png
 
+
+    

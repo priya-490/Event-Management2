@@ -161,6 +161,7 @@
 //   }
 // }
 
+<<<<<<< HEAD
 
 
 
@@ -173,6 +174,8 @@
 
 
 
+=======
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -203,6 +206,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
     if (user == null) return;
 
     try {
+<<<<<<< HEAD
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
 
       if (userDoc.exists) {
@@ -213,6 +217,17 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
         });
       } else {
         _nameController.text = user!.displayName ?? "";
+=======
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _nameController.text = userDoc['fullName'] ?? "";
+          _phoneController.text = userDoc['phoneNumber'] ?? "";
+          _selectedInterest = userDoc['interest'] ?? null;
+        });
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
       }
     } catch (e) {
       print("Error loading user data: $e");
@@ -221,7 +236,13 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
 
   Future<void> _saveChanges() async {
     if (user == null) {
+<<<<<<< HEAD
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("User not logged in!")));
+=======
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not logged in!")),
+      );
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
       return;
     }
 
@@ -230,6 +251,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
     });
 
     try {
+<<<<<<< HEAD
       await user!.updateDisplayName(_nameController.text.trim());
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
         'fullName': _nameController.text.trim(),
@@ -240,6 +262,23 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile updated successfully!")));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error updating profile: ${e.toString()}")));
+=======
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+        'fullName': _nameController.text.trim(),
+        'phoneNumber': _phoneController.text.trim(),
+        'interest': _selectedInterest ?? "None",
+      });
+
+      await user!.updateDisplayName(_nameController.text.trim());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating profile: ${e.toString()}")),
+      );
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
     }
 
     setState(() {
@@ -249,12 +288,24 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
 
   void _deleteAccount() {
     // TODO: Implement delete account logic with FirebaseAuth
+<<<<<<< HEAD
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Delete account feature coming soon!")));
+=======
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Delete account feature coming soon!")),
+    );
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
   }
 
   void _uploadProfilePicture() {
     // TODO: Implement profile picture upload
+<<<<<<< HEAD
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile picture upload coming soon!")));
+=======
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile picture upload coming soon!")),
+    );
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
   }
 
   @override
@@ -277,6 +328,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+<<<<<<< HEAD
+=======
+            // Profile Picture
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
             Center(
               child: Stack(
                 children: [
@@ -299,12 +354,20 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
             ),
             const SizedBox(height: 20),
 
+<<<<<<< HEAD
+=======
+            // Name
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: "Full Name"),
             ),
             const SizedBox(height: 10),
 
+<<<<<<< HEAD
+=======
+            // Email (non-editable)
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
             TextField(
               decoration: InputDecoration(
                 labelText: "Email",
@@ -314,6 +377,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
             ),
             const SizedBox(height: 10),
 
+<<<<<<< HEAD
+=======
+            // Phone Number
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
             TextField(
               controller: _phoneController,
               decoration: const InputDecoration(labelText: "Phone Number"),
@@ -321,6 +388,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
             ),
             const SizedBox(height: 10),
 
+<<<<<<< HEAD
+=======
+            // Interests Dropdown
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
             DropdownButtonFormField<String>(
               value: _selectedInterest,
               hint: const Text("Select Interest"),
@@ -338,6 +409,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
             ),
             const SizedBox(height: 20),
 
+<<<<<<< HEAD
+=======
+            // Action Buttons
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -360,6 +435,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
     );
   }
 }
+<<<<<<< HEAD
 
 
 
@@ -620,3 +696,5 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
 //     );
 //   }
 // }
+=======
+>>>>>>> ee2c434861c688169b84622b9a04f621d533bb86
