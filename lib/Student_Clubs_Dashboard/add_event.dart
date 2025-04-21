@@ -13,7 +13,7 @@ class AddEventScreen extends StatefulWidget {
 
 class _AddEventScreenState extends State<AddEventScreen> {
   final _formKey = GlobalKey<FormState>();
-
+final TextEditingController eventNameController = TextEditingController();
   String documentId = '';
   String eventName = '';
   String eventDescription = '';
@@ -70,6 +70,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
+  // final TextEditingController eventNameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -99,13 +101,21 @@ class _AddEventScreenState extends State<AddEventScreen> {
                 "Event Name",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
+              // TextFormField(
+              //   decoration: const InputDecoration(border: OutlineInputBorder()),
+              //   validator:
+              //       (value) =>
+              //           value!.isEmpty ? 'Please enter event name' : null,
+              //   onSaved: (value) => eventName = value!,
+              // ),
+              // final TextEditingController eventNameController = TextEditingController();
               TextFormField(
-                decoration: const InputDecoration(border: OutlineInputBorder()),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? 'Please enter event name' : null,
-                onSaved: (value) => eventName = value!,
-              ),
+  controller: eventNameController,
+  decoration: const InputDecoration(border: OutlineInputBorder()),
+  validator: (value) => value!.isEmpty ? 'Please enter event name' : null,
+),
+
+
               const SizedBox(height: 16),
 
               const Text(
@@ -286,8 +296,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
         //  'userId': FirebaseAuth.instance.currentUser?.email ?? "";
         final userId = user?.uid ?? "";
         print("eventName : $eventName"); // debugging
-        await FirebaseFirestore.instance.collection('events').add({
+        eventName = eventNameController.text.trim();
 
+        await FirebaseFirestore.instance.collection('events').add({
           'Event Name': eventName,
           'Event Description': eventDescription,
           'Event Venue': eventVenue,
