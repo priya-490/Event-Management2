@@ -285,8 +285,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
         final user = FirebaseAuth.instance.currentUser;
         //  'userId': FirebaseAuth.instance.currentUser?.email ?? "";
         final userId = user?.uid ?? "";
-
+        print("eventName : $eventName"); // debugging
         await FirebaseFirestore.instance.collection('events').add({
+
           'Event Name': eventName,
           'Event Description': eventDescription,
           'Event Venue': eventVenue,
