@@ -4,8 +4,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  String formatDate(Timestamp timestamp) {
-    DateTime date = timestamp.toDate();
+  // String formatDate(Timestamp timestamp) {
+  //   DateTime date = timestamp.toDate();
+  //   return "${date.day}-${date.month}-${date.year} ${date.hour}:${date.minute}";
+  // }
+  String formatDate(dynamic date) {
+    if (date is Timestamp) {
+      date = date.toDate();
+    } else if (date is String) {
+      try {
+        date = DateTime.parse(date);
+      } catch (_) {
+        return 'Invalid date';
+      }
+    } else {
+      return 'Unknown date';
+    }
     return "${date.day}-${date.month}-${date.year} ${date.hour}:${date.minute}";
   }
 
@@ -14,10 +28,11 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Approved Events by Clubs')),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('events')
-            .where('status', isEqualTo: 'approved')
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('events')
+                .where('status', isEqualTo: 'approved')
+                .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -36,41 +51,55 @@ class HomePage extends StatelessWidget {
           }
 
           return ListView(
-            children: clubEvents.entries.map((entry) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      entry.key,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ...entry.value.map((event) {
-                    var timestamp = event['Start Date'] as Timestamp;
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        leading: Image.asset(
-                          'assets/a.jpeg',
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
+            children:
+                clubEvents.entries.map((entry) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          entry.key,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        title: Text(event['Event Name'],
-                            style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(
-                          'Venue: ${event['Event Venue']}\nDate: ${formatDate(timestamp)}',
-                        ),
-                        onTap: () {},
                       ),
-                    );
-                  }).toList(),
-                ],
-              );
-            }).toList(),
+                      ...entry.value.map((event) {
+                        // var timestamp = event['Start Date'] as Timestamp;
+                        var timestamp = event['Start Date'];
+                        Text('Date: ${formatDate(timestamp)}');
+
+                        return Card(
+                          margin: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            leading: Image.asset(
+                              'assets/a.jpeg',
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                            title: Text(
+                              event['Event Name'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            // subtitle: Text(
+                            //   'Venue: ${event['Event Venue']}\nDate: ${formatDate(timestamp)}',
+                            // ),
+                            subtitle: Text(
+                              'Venue: ${event['Event Venue']}\nDate: ${formatDate(event['Start Date'])}',
+                            ),
+
+                            onTap: () {},
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                }).toList(),
           );
         },
       ),
