@@ -133,7 +133,7 @@ class HomeScreen extends StatelessWidget {
                           ? (eventData["ParticipantsId"] as List).length
                           : 0,
 
-                  image: eventData["image"] ?? "assets/default.jpg",
+                  image: eventData["imageUrl"] ?? "assets/default.jpg",
                   venue: eventData["Event Venue"] ?? "Unknown Location",
                   description:
                       eventData["Event Description"] ?? "No Description",

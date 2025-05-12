@@ -433,7 +433,7 @@ class _ViewDetailsScreenState extends State<ViewDetailsScreen> {
                 ),
               ),
 
-              
+
             ],
           ),
         ),

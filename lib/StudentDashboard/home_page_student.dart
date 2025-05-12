@@ -63,28 +63,7 @@ class HomePage extends StatelessWidget {
 
           final events = snapshot.data!.docs; // 📜 Firestore data
 
-          // return ListView.builder(
-          //   padding: const EdgeInsets.all(10),
-          //   itemCount: events.length,
-          //   itemBuilder: (context, index) {
-          //     final eventData = events[index].data() as Map<String, dynamic>;
-
-          //     return Padding(
-          //       padding: const EdgeInsets.only(bottom: 10),
-          //       child: EventBox(
-          //         title: eventData["Event Name"] ?? "No Title",
-          //         date: eventData["Start Date"] ?? "No Date",
-          //         attendees: eventData["ParticipantsId"] is List
-          //             ? (eventData["ParticipantsId"] as List).length
-          //             : 0, // 🔹 Convert list count to int
-          //         image: "assets/default.jpg", // Change this if you have an image field
-          //         venue: eventData["Event Venue"] ?? "Unknown Location",
-          //         description: eventData["Event Description"] ?? "No Description",
-          //         club: eventData["club"] ?? "General",
-          //       ),
-          //     );
-          //   },
-          // );
+          
           return ListView.builder(
             padding: const EdgeInsets.all(10),
             itemCount: events.length,
@@ -113,8 +92,8 @@ class HomePage extends StatelessWidget {
                           : 0,
 
                   image:
-                      eventData["image"] ??
-                      "assets/default.jpg", // ✅ Use dynamic image if available
+                      eventData["imageUrl"] ??
+                      "assets/b.jpeg", // ✅ Use dynamic image if available
                   venue: eventData["Event Venue"] ?? "Unknown Location",
                   description:
                       eventData["Event Description"] ?? "No Description",
