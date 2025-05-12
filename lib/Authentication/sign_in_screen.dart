@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart'; // Add this import
 
 import '../StudentDashboard/main_screen.dart';
+import '../StudentDashboard/bottom_nav_screen.dart';
+
 import '../AdminDashboard/cur_admin_dashboard.dart';
 import '../Student_Clubs_Dashboard/club_dashboard.dart';
 
@@ -82,7 +84,9 @@ class _SignInScreenState extends State<SignInScreen> {
         await _storeFCMToken(user.uid, 'student');
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          // MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => const BottomNavScreen()),
+
         );
       }
     } catch (e) {
