@@ -57,11 +57,18 @@ class EventDetailPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () => _updateEventStatus(context, 'approved'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
                   child: const Text('Approve'),
                 ),
+                // ElevatedButton(
+                //   onPressed: () => _updateEventStatus(context, 'rejected'),
+                //   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                //   child: const Text('Reject'),
+                // ),
                 ElevatedButton(
-                  onPressed: () => _updateEventStatus(context, 'rejected'),
+                  onPressed: () => _showRemarksDialog(context),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   child: const Text('Reject'),
                 ),
@@ -73,20 +80,87 @@ class EventDetailPage extends StatelessWidget {
     );
   }
 
-  void _updateEventStatus(BuildContext context, String status) {
+  void _showRemarksDialog(BuildContext context) {
+    final TextEditingController _remarksController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Rejection Remarks'),
+          content: TextField(
+            controller: _remarksController,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              hintText: 'Enter remarks explaining the rejection...',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final remarks = _remarksController.text.trim();
+                if (remarks.isNotEmpty) {
+                  _updateEventStatus(context, 'rejected', remarks);
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter remarks')),
+                  );
+                }
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // void _updateEventStatus(BuildContext context, String status) {
+  //   FirebaseFirestore.instance
+  //       .collection('events')
+  //       .doc(event.id)
+  //       .update({'status': status})
+  //       .then((_) {
+  //         ScaffoldMessenger.of(
+  //           context,
+  //         ).showSnackBar(SnackBar(content: Text('Event $status Successfully')));
+  //         Navigator.pop(context);
+  //       })
+  //       .catchError((error) {
+  //         ScaffoldMessenger.of(
+  //           context,
+  //         ).showSnackBar(SnackBar(content: Text('Failed to update: $error')));
+  //       });
+  // }
+  void _updateEventStatus(
+    BuildContext context,
+    String status, [
+    String? remarks,
+  ]) {
+    final updateData = {'status': status};
+    if (status == 'rejected' && remarks != null) {
+      updateData['rejectionRemarks'] = remarks;
+    }
+
     FirebaseFirestore.instance
         .collection('events')
         .doc(event.id)
-        .update({'status': status})
+        .update(updateData)
         .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Event $status Successfully')),
-      );
-      Navigator.pop(context);
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update: $error')),
-      );
-    });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Event $status Successfully')));
+          Navigator.pop(context);
+        })
+        .catchError((error) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to update: $error')));
+        });
   }
 }

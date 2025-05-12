@@ -52,9 +52,11 @@ class HomeScreen extends StatelessWidget {
 
       // Fetch Events from Firestore
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('events')
-        .where('status' , isEqualTo: 'approved')
-        .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('events')
+                .where('status', isEqualTo: 'approved')
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -65,18 +67,59 @@ class HomeScreen extends StatelessWidget {
 
           final events = snapshot.data!.docs;
 
+          // return ListView.builder(
+          //   padding: const EdgeInsets.all(10),
+          //   itemCount: events.length,
+          //   itemBuilder: (context, index) {
+          //         final doc = events[index]; // 🔧 Add this line
+
+          //     final eventData = events[index].data() as Map<String, dynamic>;
+
+          //     return Padding(
+          //       padding: const EdgeInsets.only(bottom: 10),
+          //       child: EventBox(
+          //           documentId: doc.id, // ✅ Pass the documentId from Firestore
+
+          //         title: eventData["Event Name"] ?? "No Title",
+          //         // date: eventData["Start Date"] ?? "No Date",
+          //         // date: (eventData['Start Date'] as Timestamp).toDate(), // ✅ Convert here
+          //         date:
+          //             eventData['Start Date'] is Timestamp
+          //                 ? (eventData['Start Date'] as Timestamp).toDate()
+          //                 : DateTime.tryParse(
+          //                       eventData['Start Date'].toString(),
+          //                     ) ??
+          //                     DateTime.now(),
+
+          //         // attendees: eventData["attendees"] ?? "Unknown",
+          //         attendees:
+          //             (eventData["ParticipantsId"] is List)
+          //                 ? (eventData["ParticipantsId"] as List).length
+          //                 : 0,
+
+          //         image: eventData["image"] ?? "assets/default.jpg",
+          //         venue: eventData["Event Venue"] ?? "Unknown Location",
+          //         description:
+          //             eventData["Event Description"] ?? "No Description",
+          //         club: eventData["club"] ?? "General",
+          //       ),
+          //     );
+          //   },
+          // );
           return ListView.builder(
             padding: const EdgeInsets.all(10),
             itemCount: events.length,
             itemBuilder: (context, index) {
-              final eventData = events[index].data() as Map<String, dynamic>;
+              final doc = events[index]; // 🔧 Add this line
+              final eventData = doc.data() as Map<String, dynamic>;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: EventBox(
+                  documentId: doc.id, // ✅ Now this works
+
                   title: eventData["Event Name"] ?? "No Title",
-                  // date: eventData["Start Date"] ?? "No Date",
-                  // date: (eventData['Start Date'] as Timestamp).toDate(), // ✅ Convert here
+
                   date:
                       eventData['Start Date'] is Timestamp
                           ? (eventData['Start Date'] as Timestamp).toDate()
@@ -85,7 +128,6 @@ class HomeScreen extends StatelessWidget {
                               ) ??
                               DateTime.now(),
 
-                  // attendees: eventData["attendees"] ?? "Unknown",
                   attendees:
                       (eventData["ParticipantsId"] is List)
                           ? (eventData["ParticipantsId"] as List).length
